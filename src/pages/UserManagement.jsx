@@ -57,8 +57,8 @@ function UserManagement() {
         getUserProjects(userId),
       ]);
       setDetailUser(userRes.data);
-      setDetailTasks(tasksRes.data?.data?.content ?? []);
-      setDetailProjects(projectsRes.data?.data?.content ?? []);
+      setDetailTasks(tasksRes.data?.content ?? []);
+      setDetailProjects(projectsRes.data?.content ?? []);
     } catch (err) {
       toast.error("Failed to load user details.");
     } finally { setDetailLoading(false); }

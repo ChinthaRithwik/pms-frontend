@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
@@ -15,20 +14,18 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
-
     try {
       const res = await loginUser({ email, password });
-
-      login(res.data.token);
-
+      login(res.token);
       toast.success("Login successful! Welcome back.");
       navigate("/dashboard");
-
     } catch (err) {
+      const raw = err.response?.data?.message;
       const message =
-        err.response?.data?.message || "Invalid email or password. Try again.";
+        typeof raw === "object" && raw !== null
+          ? Object.values(raw).join(", ")
+          : raw || "Invalid email or password. Try again.";
       toast.error(message);
     } finally {
       setLoading(false);
@@ -37,20 +34,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
-
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
           <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               placeholder="you@example.com"
@@ -62,9 +54,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -82,7 +72,6 @@ export default function LoginPage() {
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>
-
         </form>
 
         <p className="text-sm text-center text-gray-500 mt-5">
@@ -91,7 +80,6 @@ export default function LoginPage() {
             Register
           </Link>
         </p>
-
       </div>
     </div>
   );
