@@ -17,8 +17,8 @@ function UserManagement() {
   const queryClient = useQueryClient();
 
   const { data, isLoading: listLoading } = useUsers(listPage);
-  const users = data?.content ?? [];
-  const totalPages = data?.totalPages ?? 1;
+  const users = data?.data?.content ?? [];
+  const totalPages = data?.data?.totalPages ?? 1;
   const listLoaded = !!data;
 
   const [showCreateModal, setShowCreateModal] = useState(false);
