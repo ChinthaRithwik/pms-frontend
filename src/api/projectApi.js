@@ -1,7 +1,7 @@
 import api from "./axiosConfig";
 
-export const getProjects = async (page = 0) => {
-  const response = await api.get(`/projects?page=${page}&size=10`);
+export const getProjects = async (page = 0, size = 10) => {
+  const response = await api.get(`/projects?page=${page}&size=${size}`);
   return response.data;
 };
 

@@ -17,7 +17,7 @@ function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError } = useProjects(0);
+  const { data, isLoading, isError } = useProjects(0, 1000);
 
   const projects = data?.data?.content ?? [];
   const totalProjects = data?.data?.totalElements ?? 0;

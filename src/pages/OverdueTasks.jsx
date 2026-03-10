@@ -7,6 +7,13 @@ import Sidebar from "../components/Sidebar";
 import { useOverdueTasks } from "../hooks/useTasks";
 import { updateTaskStatus } from "../api/taskApi";
 
+const VALID_TASK_TRANSITIONS = {
+  TODO:        ["TODO", "IN_PROGRESS"],
+  IN_PROGRESS: ["IN_PROGRESS", "COMPLETED", "BLOCKED"],
+  BLOCKED:     ["BLOCKED", "IN_PROGRESS"],
+  COMPLETED:   ["COMPLETED"],
+};
+
 const STATUS_COLORS = {
   TODO:        "bg-gray-100 text-gray-600",
   IN_PROGRESS: "bg-blue-100 text-blue-700",
@@ -112,7 +119,7 @@ function OverdueTasks() {
                               STATUS_COLORS[task.status] ?? "bg-gray-100"
                             }`}
                           >
-                            {ALL_STATUSES.map((s) => (
+                            {(VALID_TASK_TRANSITIONS[task.status] ?? ALL_STATUSES).map((s) => (
                               <option key={s} value={s}>
                                 {s.replace("_", " ")}
                               </option>
