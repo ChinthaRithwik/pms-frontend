@@ -33,3 +33,8 @@ export const updateProjectStatus = async (id, status) => {
 export const deleteProject = async (id) => {
   await api.delete(`/projects/${id}`);
 };
+
+export const getProjectStats = async () => {
+  const response = await api.get("/projects/stats");
+  return response.data;
+};

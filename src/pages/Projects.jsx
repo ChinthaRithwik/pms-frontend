@@ -51,7 +51,7 @@ function Projects() {
   const navigate    = useNavigate();
 
   const myProjectsQuery = useProjects(page);
-  const allProjectsQuery = useAllSystemProjects(page);
+  const allProjectsQuery = useAllSystemProjects(page, { enabled: isAdmin && viewMode === "all" });
 
   const activeQuery = (isAdmin && viewMode === "all") ? allProjectsQuery : myProjectsQuery;
   const { data, isLoading, isError, error } = activeQuery;
