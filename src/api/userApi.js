@@ -5,8 +5,8 @@ export const createUser = async (data) => {
   return response.data;
 };
 
-export const getAllUsers = async (page = 0) => {
-  const response = await api.get(`/users?page=${page}&size=10`);
+export const getAllUsers = async (page = 0, size = 10) => {
+  const response = await api.get(`/users?page=${page}&size=${size}`);
   return response.data;
 };
 

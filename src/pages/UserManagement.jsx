@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUsers } from "../hooks/useUsers";
 
 import Navbar  from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 
 import {
-  getAllUsers, createUser, getUserById,
+  createUser, getUserById,
   deleteUser, getUserTasks, getUserProjects,
 } from "../api/userApi";
 
 function UserManagement() {
 
-  const [users,        setUsers]        = useState([]);
   const [listPage,     setListPage]     = useState(0);
-  const [totalPages,   setTotalPages]   = useState(1);
-  const [listLoading,  setListLoading]  = useState(false);
-  const [listLoaded,   setListLoaded]   = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data, isLoading: listLoading } = useUsers(listPage);
+  const users = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 1;
+  const listLoaded = !!data;
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createName,      setCreateName]      = useState("");
@@ -29,21 +33,6 @@ function UserManagement() {
   const [detailLoading,  setDetailLoading]  = useState(false);
   const [detailTab,      setDetailTab]      = useState("info");
 
-  const fetchUsers = async (page = 0) => {
-    setListLoading(true);
-    try {
-      const res = await getAllUsers(page);
-      setUsers(res.data.content);
-      setTotalPages(res.data.totalPages);
-      setListPage(page);
-      setListLoaded(true);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to load users.");
-    } finally {
-      setListLoading(false);
-    }
-  };
-
   const handleCreate = async (e) => {
     e.preventDefault(); setCreateLoading(true);
     try {
@@ -51,7 +40,7 @@ function UserManagement() {
       toast.success("User created!");
       setShowCreateModal(false);
       setCreateName(""); setCreateEmail(""); setCreatePassword("");
-      if (listLoaded) fetchUsers(listPage);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create user.");
     } finally { setCreateLoading(false); }
@@ -82,7 +71,7 @@ function UserManagement() {
     try {
       await deleteUser(userId);
       toast.success("User deleted.");
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       if (detailUser?.id === userId) setDetailUser(null);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete user.");
@@ -104,9 +93,9 @@ function UserManagement() {
             </div>
             <div className="flex gap-3">
               
-              <button onClick={() => fetchUsers(0)}
+              <button onClick={() => queryClient.invalidateQueries({ queryKey: ["users"] })}
                 className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                {listLoaded ? "🔄 Refresh" : "📋 Load All Users"}
+                🔄 Refresh
               </button>
               
               <button onClick={() => setShowCreateModal(true)}
@@ -180,10 +169,10 @@ function UserManagement() {
                   </div>
 
                   <div className="flex items-center gap-4 mt-4">
-                    <button onClick={() => fetchUsers(listPage - 1)} disabled={listPage === 0}
+                    <button onClick={() => setListPage(listPage - 1)} disabled={listPage === 0}
                       className="px-4 py-2 rounded-lg bg-white border text-sm disabled:opacity-40">← Prev</button>
                     <span className="text-sm text-gray-500">Page {listPage + 1} of {totalPages}</span>
-                    <button onClick={() => fetchUsers(listPage + 1)} disabled={listPage >= totalPages - 1}
+                    <button onClick={() => setListPage(listPage + 1)} disabled={listPage >= totalPages - 1}
                       className="px-4 py-2 rounded-lg bg-white border text-sm disabled:opacity-40">Next →</button>
                   </div>
                 </>

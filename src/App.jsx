@@ -7,6 +7,7 @@ import OverdueTasks   from "./pages/OverdueTasks";
 import LoginPage      from "./pages/LoginPage";
 import SignupPage     from "./pages/SignupPage";
 import UserManagement from "./pages/UserManagement";
+import NotFound       from "./pages/NotFound";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute     from "./routes/AdminRoute";
@@ -39,6 +40,8 @@ function App() {
         <Route path="/admin/users" element={
           <AdminRoute><UserManagement /></AdminRoute>
         } />
+
+        <Route path="*" element={<NotFound />} />
 
       </Routes>
     </BrowserRouter>

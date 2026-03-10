@@ -12,6 +12,8 @@ import {
 } from "../api/taskApi";
 
 import { useTasksByProject, useSearchTasks } from "../hooks/useTasks";
+import { useProjects } from "../hooks/useProjects";
+import { useUsers } from "../hooks/useUsers";
 import { useAuth } from "../context/AuthContext";
 
 const STATUS_COLORS = {
@@ -60,6 +62,11 @@ function Tasks() {
   const [reassignLoading, setReassignLoading] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const projQuery = useProjects(0, 1000);
+  const userQuery = useUsers(0, 1000);
+  const allProjects = projQuery.data?.data?.content || [];
+  const allUsers    = userQuery.data?.data?.content || [];
 
   useEffect(() => {
     if (urlProjectId) { setProjectId(urlProjectId); setMode("browse"); }
@@ -190,10 +197,13 @@ function Tasks() {
           {mode === "browse" && (
             <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap gap-4 items-end">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Project ID</label>
-                <input type="number" placeholder="Enter project ID"
+                <label className="block text-xs font-medium text-gray-500 mb-1">Project</label>
+                <select
                   className="border border-gray-300 rounded-lg px-3 py-2 w-44 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={projectId} onChange={(e) => { setProjectId(e.target.value); setBrowsePage(0); }} />
+                  value={projectId} onChange={(e) => { setProjectId(e.target.value); setBrowsePage(0); }}>
+                  <option value="">Select Project</option>
+                  {allProjects.map(p => <option key={p.id} value={p.id}>#{p.id} - {p.name}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
@@ -213,10 +223,13 @@ function Tasks() {
               </p>
               <div className="flex flex-wrap gap-4 items-end">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Project ID</label>
-                  <input type="number" placeholder="Any project"
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Project</label>
+                  <select
                     className="border border-gray-300 rounded-lg px-3 py-2 w-36 text-sm"
-                    value={searchProjectId} onChange={(e) => setSearchProjectId(e.target.value)} />
+                    value={searchProjectId} onChange={(e) => setSearchProjectId(e.target.value)}>
+                    <option value="">Any Project</option>
+                    {allProjects.map(p => <option key={p.id} value={p.id}>#{p.id} - {p.name}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
@@ -227,10 +240,13 @@ function Tasks() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Assigned User ID</label>
-                  <input type="number" placeholder="Any user"
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Assigned User</label>
+                  <select
                     className="border border-gray-300 rounded-lg px-3 py-2 w-36 text-sm"
-                    value={searchAssignedUser} onChange={(e) => setSearchAssignedUser(e.target.value)} />
+                    value={searchAssignedUser} onChange={(e) => setSearchAssignedUser(e.target.value)}>
+                    <option value="">Any User</option>
+                    {allUsers.map(u => <option key={u.id} value={u.id}>#{u.id} - {u.name}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Due Before</label>
@@ -363,6 +379,7 @@ function Tasks() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                 <input type="date"
+                  min={new Date().toISOString().split('T')[0]}
                   className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={formDueDate} onChange={(e) => setFormDueDate(e.target.value)} />
               </div>
