@@ -7,7 +7,7 @@ import Navbar      from "../components/Navbar";
 import Sidebar     from "../components/Sidebar";
 import ProjectCard from "../components/ProjectCard";
 
-import { useProjects }                                         from "../hooks/useProjects";
+import { useProjects, useAllSystemProjects }                 from "../hooks/useProjects";
 import { createProject, updateProject, updateProjectStatus,
          deleteProject, getProjectById }                       from "../api/projectApi";
 import { useAuth }                                             from "../context/AuthContext";
@@ -26,6 +26,7 @@ function Projects() {
   const { isAdmin } = useAuth();
 
   const [page, setPage] = useState(0);
+  const [viewMode, setViewMode] = useState("my"); // "my" or "all"
 
   const [showModal, setShowModal]         = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -40,7 +41,11 @@ function Projects() {
   const queryClient = useQueryClient();
   const navigate    = useNavigate();
 
-  const { data, isLoading, isError, error } = useProjects(page);
+  const myProjectsQuery = useProjects(page);
+  const allProjectsQuery = useAllSystemProjects(page);
+
+  const activeQuery = (isAdmin && viewMode === "all") ? allProjectsQuery : myProjectsQuery;
+  const { data, isLoading, isError, error } = activeQuery;
   const projects   = data?.data?.content  ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
@@ -92,6 +97,7 @@ function Projects() {
         toast.success("Project created!");
       }
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["allSystemProjects"] });
       closeModal();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong.");
@@ -106,6 +112,7 @@ function Projects() {
       await deleteProject(projectId);
       toast.success("Project deleted.");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["allSystemProjects"] });
       if (projects.length === 1 && page > 0) setPage((p) => p - 1);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete project.");
@@ -119,13 +126,41 @@ function Projects() {
         <Sidebar />
         <main className="flex-1 p-8">
 
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">Projects</h1>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-bold text-gray-800">Projects</h1>
+              {isAdmin && (
+                <div className="bg-gray-200 p-1 rounded-lg flex items-center">
+                  <button
+                    onClick={() => { setViewMode("my"); setPage(0); }}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      viewMode === "my" ? "bg-white shadow text-gray-800" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    My Projects
+                  </button>
+                  <button
+                    onClick={() => { setViewMode("all"); setPage(0); }}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      viewMode === "all" ? "bg-white shadow text-gray-800" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    All System Projects
+                  </button>
+                </div>
+              )}
+            </div>
             <button onClick={openCreateModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap">
               + Create Project
             </button>
           </div>
+
+          {(viewMode === "all" && isAdmin) && (
+            <p className="text-sm text-red-500 mb-6 -mt-2">
+              Viewing all projects in the system. You have admin privileges to edit any project.
+            </p>
+          )}
 
           {isLoading && <p className="text-gray-400">Loading projects…</p>}
           {isError   && <p className="text-red-500">Failed to load: {error?.message}</p>}
@@ -201,7 +236,6 @@ function Projects() {
                 ))}
 
                 <div className="flex gap-3 mt-5">
-                  
                   <button
                     onClick={() => {
                       setDetailProject(null);

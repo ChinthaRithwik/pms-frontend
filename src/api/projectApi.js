@@ -5,6 +5,11 @@ export const getProjects = async (page = 0) => {
   return response.data;
 };
 
+export const getAllSystemProjects = async (page = 0) => {
+  const response = await api.get(`/projects/all?page=${page}&size=10`);
+  return response.data;
+};
+
 export const getProjectById = async (id) => {
   const response = await api.get(`/projects/${id}`);
   return response.data;
