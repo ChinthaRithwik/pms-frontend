@@ -22,6 +22,15 @@ const STATUS_COLORS = {
 
 const ALL_PROJECT_STATUSES = ["PLANNED","IN_PROGRESS","ON_HOLD","COMPLETED","CANCELLED"];
 
+// Mirror the backend's projectStatusAllowedTransitions map
+const VALID_PROJECT_TRANSITIONS = {
+  PLANNED:     ["PLANNED", "IN_PROGRESS", "CANCELLED"],
+  IN_PROGRESS: ["IN_PROGRESS", "ON_HOLD", "COMPLETED", "CANCELLED"],
+  ON_HOLD:     ["ON_HOLD", "IN_PROGRESS", "CANCELLED"],
+  COMPLETED:   ["COMPLETED"],
+  CANCELLED:   ["CANCELLED"],
+};
+
 function Projects() {
   const { isAdmin } = useAuth();
 
@@ -290,10 +299,13 @@ function Projects() {
                   <select
                     className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     value={formStatus} onChange={(e) => setFormStatus(e.target.value)}>
-                    {ALL_PROJECT_STATUSES.map((s) => (
+                    {(VALID_PROJECT_TRANSITIONS[editingProject.status] ?? ALL_PROJECT_STATUSES).map((s) => (
                       <option key={s} value={s}>{s.replace("_"," ")}</option>
                     ))}
                   </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Current: {editingProject.status?.replace("_"," ")}
+                  </p>
                 </div>
               )}
 

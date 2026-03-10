@@ -22,6 +22,14 @@ const STATUS_COLORS = {
 };
 const ALL_STATUSES = ["TODO","IN_PROGRESS","COMPLETED","BLOCKED"];
 
+// Mirror the backend's AllowedTransitions map
+const VALID_TASK_TRANSITIONS = {
+  TODO:        ["TODO", "IN_PROGRESS"],
+  IN_PROGRESS: ["IN_PROGRESS", "COMPLETED", "BLOCKED"],
+  BLOCKED:     ["BLOCKED", "IN_PROGRESS"],
+  COMPLETED:   ["COMPLETED"],
+};
+
 function Tasks() {
   const { isAdmin } = useAuth();
 
@@ -283,7 +291,7 @@ function Tasks() {
                             <select value={task.status}
                               onChange={(e) => handleStatusChange(task.id, e.target.value)}
                               className={`text-xs font-medium px-2 py-1 rounded-full border-0 cursor-pointer ${STATUS_COLORS[task.status] ?? "bg-gray-100"}`}>
-                              {ALL_STATUSES.map((s) => (
+                              {(VALID_TASK_TRANSITIONS[task.status] ?? ALL_STATUSES).map((s) => (
                                 <option key={s} value={s}>{s.replace("_"," ")}</option>
                               ))}
                             </select>
