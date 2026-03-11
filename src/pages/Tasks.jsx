@@ -65,8 +65,8 @@ function Tasks() {
 
   const projQuery = useProjects(0, 1000);
   const userQuery = useUsers(0, 1000);
-  const allProjects = projQuery.data?.data?.content || [];
-  const allUsers    = userQuery.data?.data?.content || [];
+  const allProjects = projQuery.data?.content || [];
+  const allUsers    = userQuery.data?.content || [];
 
   useEffect(() => {
     if (urlProjectId) { setProjectId(urlProjectId); setMode("browse"); }
@@ -84,8 +84,8 @@ function Tasks() {
   );
 
   const activeQuery = mode === "browse" ? browseQuery : searchQuery;
-  const tasks       = activeQuery.data?.data?.content  ?? [];
-  const totalPages  = activeQuery.data?.data?.totalPages ?? 1;
+  const tasks       = activeQuery.data?.content  ?? [];
+  const totalPages  = activeQuery.data?.totalPages ?? 1;
   const page        = mode === "browse" ? browsePage : searchPage;
   const setPage     = mode === "browse" ? setBrowsePage : setSearchPage;
 

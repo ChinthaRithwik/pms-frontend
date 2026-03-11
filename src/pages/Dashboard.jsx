@@ -23,7 +23,7 @@ function Dashboard() {
 
   // Recent projects list (small page, not size=1000)
   const { data: projectsData, isLoading: projectsLoading } = useProjects(0, 5);
-  const recentProjects = projectsData?.data?.content ?? [];
+  const recentProjects = projectsData?.content ?? [];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -44,10 +44,10 @@ function Dashboard() {
             <p className="text-red-500">Failed to load project stats.</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatCard label="Total Projects" count={stats?.data?.TOTAL ?? 0}       color="border-blue-500" />
-              <StatCard label="In Progress"    count={stats?.data?.IN_PROGRESS ?? 0} color="border-yellow-400" />
-              <StatCard label="Completed"      count={stats?.data?.COMPLETED ?? 0}   color="border-green-500" />
-              <StatCard label="On Hold"        count={stats?.data?.ON_HOLD ?? 0}     color="border-gray-400" />
+              <StatCard label="Total Projects" count={stats?.TOTAL ?? 0}       color="border-blue-500" />
+              <StatCard label="In Progress"    count={stats?.IN_PROGRESS ?? 0} color="border-yellow-400" />
+              <StatCard label="Completed"      count={stats?.COMPLETED ?? 0}   color="border-green-500" />
+              <StatCard label="On Hold"        count={stats?.ON_HOLD ?? 0}     color="border-gray-400" />
             </div>
           )}
 

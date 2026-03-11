@@ -55,15 +55,15 @@ function Projects() {
 
   const activeQuery = (isAdmin && viewMode === "all") ? allProjectsQuery : myProjectsQuery;
   const { data, isLoading, isError, error } = activeQuery;
-  const projects   = data?.data?.content  ?? [];
-  const totalPages = data?.data?.totalPages ?? 1;
+  const projects   = data?.content  ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   const openDetailModal = async (projectId) => {
     setLoadingDetail(true);
     setDetailProject(null);
     try {
       const res = await getProjectById(projectId);
-      setDetailProject(res.data);
+      setDetailProject(res);
     } catch {
       toast.error("Failed to load project details.");
     } finally {

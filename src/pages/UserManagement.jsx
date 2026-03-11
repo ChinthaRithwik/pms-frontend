@@ -17,8 +17,8 @@ function UserManagement() {
   const queryClient = useQueryClient();
 
   const { data, isLoading: listLoading } = useUsers(listPage);
-  const users = data?.data?.content ?? [];
-  const totalPages = data?.data?.totalPages ?? 1;
+  const users = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 1;
   const listLoaded = !!data;
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -56,9 +56,9 @@ function UserManagement() {
         getUserTasks(userId),
         getUserProjects(userId),
       ]);
-      setDetailUser(userRes.data);
-      setDetailTasks(tasksRes.data?.content ?? []);
-      setDetailProjects(projectsRes.data?.content ?? []);
+      setDetailUser(userRes);
+      setDetailTasks(tasksRes?.content ?? []);
+      setDetailProjects(projectsRes?.content ?? []);
     } catch (err) {
       toast.error("Failed to load user details.");
     } finally { setDetailLoading(false); }
