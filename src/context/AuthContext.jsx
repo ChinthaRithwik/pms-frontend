@@ -5,17 +5,16 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
-  const storedUser = localStorage.getItem("user");
-  let parsedUser = null;
-  try {
-    parsedUser = storedUser ? JSON.parse(storedUser) : null;
-  } catch {
-    parsedUser = null;
-  }
-
-  const [user, setUser] = useState(parsedUser);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    try {
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -25,12 +24,15 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    if (user?.exp) {
-      const currentTime = Date.now() / 1000;
-      if (user.exp < currentTime) {
+    const checkExpiry = () => {
+      if (user?.exp && user.exp < Date.now() / 1000) {
         logout();
       }
-    }
+    };
+    checkExpiry(); // immediate check on mount / user change
+    // FIX M1: poll every 60 s to catch mid-session token expiry
+    const timer = setInterval(checkExpiry, 60_000);
+    return () => clearInterval(timer);
   }, [user]);
 
   const login = (jwtToken) => {

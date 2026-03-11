@@ -8,7 +8,7 @@ import Sidebar from "../components/Sidebar";
 
 import {
   createTask, deleteTask, updateTaskStatus, updateTask,
-  updateTaskAssignee, searchTasks,
+  updateTaskAssignee
 } from "../api/taskApi";
 
 import { useTasksByProject, useSearchTasks } from "../hooks/useTasks";
@@ -271,7 +271,7 @@ function Tasks() {
           {mode === "browse" && !projectId && (
             <div className="text-center py-16 text-gray-400">
               <p className="text-5xl mb-4">✅</p>
-              <p>Enter a Project ID above or click "Tasks" on a project card.</p>
+              <p>Select a project from the dropdown above to view its tasks.</p>
             </div>
           )}
           {activeQuery.isLoading && <p className="text-gray-400">Loading tasks…</p>}
@@ -378,19 +378,28 @@ function Tasks() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input type="date"
-                  min={new Date().toISOString().split('T')[0]}
+                <input
+                  type="date"
+                  min={editingTask ? undefined : new Date().toISOString().split('T')[0]}
                   className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={formDueDate} onChange={(e) => setFormDueDate(e.target.value)} />
+                  value={formDueDate}
+                  onChange={(e) => setFormDueDate(e.target.value)}
+                />
               </div>
               {!editingTask && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Assigned User ID <span className="text-red-500">*</span>
+                    Assign To <span className="text-red-500">*</span>
                   </label>
-                  <input type="number" required placeholder="e.g. 1"
+                  {/* FIX H1: replaced raw number input with dropdown over fetched users */}
+                  <select required
                     className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={formAssignedUserId} onChange={(e) => setFormAssignedUserId(e.target.value)} />
+                    value={formAssignedUserId} onChange={(e) => setFormAssignedUserId(e.target.value)}>
+                    <option value="">Select a user…</option>
+                    {allUsers.map((u) => (
+                      <option key={u.id} value={u.id}>#{u.id} — {u.name}</option>
+                    ))}
+                  </select>
                 </div>
               )}
               <div className="flex gap-3 pt-2">
@@ -418,11 +427,17 @@ function Tasks() {
             <form onSubmit={handleReassign} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  New Assigned User ID <span className="text-red-500">*</span>
+                  New Assignee <span className="text-red-500">*</span>
                 </label>
-                <input type="number" required placeholder="e.g. 3"
+                {/* FIX H1: replaced raw number input with dropdown over fetched users */}
+                <select required
                   className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                  value={reassignUserId} onChange={(e) => setReassignUserId(e.target.value)} />
+                  value={reassignUserId} onChange={(e) => setReassignUserId(e.target.value)}>
+                  <option value="">Select a user…</option>
+                  {allUsers.map((u) => (
+                    <option key={u.id} value={u.id}>#{u.id} — {u.name}</option>
+                  ))}
+                </select>
                 <p className="text-xs text-gray-400 mt-1">
                   Current assignee: {reassignTask.assignedUserId ? `User #${reassignTask.assignedUserId}` : "None"}
                 </p>

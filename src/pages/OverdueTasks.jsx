@@ -29,9 +29,11 @@ function OverdueTasks() {
 
   const { data, isLoading, isError } = useOverdueTasks(page);
 
-  const tasks = data?.data?.content ?? [];
-  const totalPages = data?.data?.totalPages ?? 1;
-  const totalOverdue = data?.data?.totalElements ?? 0;
+  // FIX C1: axios interceptor already unwraps the ApiResponse wrapper.
+  // data IS the Page object directly — no extra .data layer needed.
+  const tasks        = data?.content       ?? [];
+  const totalPages   = data?.totalPages    ?? 1;
+  const totalOverdue = data?.totalElements ?? 0;
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
