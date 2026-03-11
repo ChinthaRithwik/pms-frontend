@@ -5,7 +5,12 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    if (res.data && res.data.message === "Success" && "data" in res.data) {
+      res.data = res.data.data;
+    }
+    return res;
+  },
   (err) => {
     if (err.response?.status === 401) {
       localStorage.clear();
