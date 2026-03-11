@@ -108,8 +108,9 @@ function Tasks() {
         toast.success("Task updated!");
       } else {
         await createTask(projectId, {
-          title: formTitle, dueDate: formDueDate || null,
-          assignedUserId: Number(formAssignedUserId),
+          title: formTitle,
+          dueDate: formDueDate || null,
+          ...(isAdmin ? { assignedUserId: Number(formAssignedUserId) } : {}),
         });
         toast.success("Task created!");
       }
@@ -316,7 +317,7 @@ function Tasks() {
                           <td className="px-4 py-3 text-gray-500">{task.dueDate ?? "—"}</td>
                           <td className="px-4 py-3 text-gray-500">#{task.projectId ?? "—"}</td>
                           <td className="px-4 py-3 text-gray-500">
-                            {task.assignedUserId ? `User #${task.assignedUserId}` : "—"}
+                            {task.assignedUserName || (task.assignedUserId ? `User #${task.assignedUserId}` : "—")}
                           </td>
 
                           <td className="px-4 py-3">
@@ -386,7 +387,7 @@ function Tasks() {
                   onChange={(e) => setFormDueDate(e.target.value)}
                 />
               </div>
-              {!editingTask && (
+              {!editingTask && isAdmin && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Assign To <span className="text-red-500">*</span>
@@ -439,7 +440,7 @@ function Tasks() {
                   ))}
                 </select>
                 <p className="text-xs text-gray-400 mt-1">
-                  Current assignee: {reassignTask.assignedUserId ? `User #${reassignTask.assignedUserId}` : "None"}
+                  Current assignee: {reassignTask.assignedUserName || (reassignTask.assignedUserId ? `User #${reassignTask.assignedUserId}` : "None")}
                 </p>
               </div>
               <div className="flex gap-3">
